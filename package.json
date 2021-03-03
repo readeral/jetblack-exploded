@@ -9,11 +9,9 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "html-dom-parser": "^1.0.0",
     "next": "10.0.7",
     "react": "17.0.1",
     "react-dom": "17.0.1",
-    "react-modal": "^3.12.1",
-    "xmldom": "^0.4.0"
+    "react-modal": "^3.12.1"
   }
 }
