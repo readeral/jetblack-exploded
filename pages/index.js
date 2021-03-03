@@ -19,9 +19,8 @@ ReactModal.setAppElement('#root')
 
 export default function Home() {
 
-
-  let domparser = new DOMParser()
   
+
   const [exceptions, setExceptions] = useState([])
   const [multiples, setMultiples] = useState([])
   const [unkeyedData, setUnkeyedData] = useState()
@@ -71,6 +70,7 @@ export default function Home() {
   }
 
   const pullPageData = () => {
+    let domparser = new DOMParser()
     fetch('/api/pull', {
       method: 'POST',
       headers: {
@@ -165,6 +165,7 @@ export default function Home() {
 
 
   function translateHtml() {
+    let domparser = new DOMParser()
     setExceptions([]);
     setMultiples([]);
     const outputArea = document.getElementById('htmloutput');
