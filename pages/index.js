@@ -38,6 +38,18 @@ export default function Home() {
     setIsOpen(true);
   }
 
+  function resetPageData() {
+    setExceptions([])
+    setMultiples([])
+    setPageData()
+    setContentID('')
+    setExplodedPage('')
+    setImageSrc()
+    setExistingMap('')
+    setNewHtml()
+    setCopied(false)
+  }
+
   function closeModal(){
     setIsOpen(false);
     if (apiKey.length >= 32 && !unkeyedData) {
@@ -88,7 +100,6 @@ export default function Home() {
       const parsed = domparser.parseFromString(data.Content[0].Description1, 'text/html')
       let baseEl = parsed.createElement('base');
       baseEl.setAttribute('href', 'https://www.jetblackespresso.com.au');
-      console.log(parsed)
       parsed.head.append(baseEl);
       setPageData(parsed)
       if (parsed.getElementsByTagName("map").length >= 1) {
@@ -104,7 +115,7 @@ export default function Home() {
   }
 
 
-  const commitPageData = (newHtml) => {
+  const commitPageData = (htmlToSend) => {
     fetch('/api/commit', {
       method: 'POST',
       headers: {
@@ -112,7 +123,7 @@ export default function Home() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        newHtml: newHtml,
+        newHtml: htmlToSend,
         apiKey: apiKey,
         contentID: contentID
       })
@@ -126,8 +137,9 @@ export default function Home() {
     });
   }
 
-  const appendCode = event => {
+  const appendCode = () => {
     const returnHtml = pageData;
+
     const bodyTag = returnHtml.getElementsByTagName("body")[0]
 
     const imgTag = returnHtml.getElementsByTagName("img")[0]
@@ -135,13 +147,13 @@ export default function Home() {
 
     const mapTag = returnHtml.createElement('map');
     mapTag.setAttribute('name', 'map');
+
     newHtml.forEach(item => {
-      console.log(item)
-      mapTag.append(item)
+      mapTag.append(item.cloneNode(true))
     })
     bodyTag.append(mapTag)
     const html = Array.prototype.reduce.call(bodyTag.childNodes, (html, node) => html + ( node.outerHTML || node.nodeValue ), "");
-    
+
     commitPageData(html)
   }
 
@@ -192,7 +204,9 @@ export default function Home() {
     })
 
     setNewHtml(mapEl)
+
     const html = Array.prototype.reduce.call(data.getElementsByTagName("map"), (html, node) => html + ( node.outerHTML || node.nodeValue ), "");
+    
     outputArea.value = html;
   }
 
@@ -206,7 +220,8 @@ export default function Home() {
       <div className="segment grid" style={{width: 'calc(100% - 40px)'}}>
         <h2 style={{gridColumn: "1/3"}}>Image map input:</h2>
         <div>
-          <label>Step 1: Paste in page title here:<input style={{ display: 'block', width: "100%", fontSize: "16px", marginTop: '10px', marginBottom: '10px'}} type="text" value={explodedPage} onChange={handleExplodedPage} /></label>
+          {pageData && <button className="updateButton credentialButton" style={{marginLeft: 0, display: 'block', width: "100%", fontSize: "16px", marginTop: '10px', marginBottom: '10px'}} onClick={resetPageData}>Reset</button>}
+          <label>Step 1: Paste in page title here:<input disabled={pageData ? true : false} style={{ display: 'block', width: "100%", fontSize: "16px", marginTop: '10px', marginBottom: '10px'}} type="text" value={explodedPage} onChange={handleExplodedPage} /></label>
           <label>Step 2: Click to retrieve page details:<button disabled={explodedPage ? false : true} className="updateButton credentialButton" style={{marginLeft: 0, display: 'block', width: "100%", fontSize: "16px", marginTop: '10px', marginBottom: '10px'}} onClick={pullPageData}>Get details</button></label>
 
         <label>Step 3: <button disabled={imageSrc ? false : true} className="updateButton credentialButton" style={{marginLeft: 0, display: 'block', width: "100%", fontSize: "16px", marginTop: '10px', marginBottom: '10px'}} onClick={() => copyClipboard(imageSrc)}>Copy image URL</button></label>

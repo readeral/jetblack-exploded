@@ -41,6 +41,8 @@ export default async function commit(req, res) {
 
   const {contentID, newHtml, apiKey} = req.body;
 
+  console.log(newHtml)
+
   fetch('https://www.jetblackespresso.com.au/do/WS/NetoAPI', {
     method: 'POST',
     headers: {
