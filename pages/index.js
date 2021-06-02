@@ -180,22 +180,23 @@ export default function Home() {
     let domparser = new DOMParser()
     setExceptions([]);
     setMultiples([]);
-    const outputArea = document.getElementById('htmloutput');
-    const option = document.querySelector('input[name="string-options"]:checked').value
+    const outputArea = document.getElementById('htmloutput'); //Get the 'Step 6' field
+    const option = document.querySelector('input[name="string-options"]:checked').value //SKU or part number
     const rawString = document.getElementById('htmlinput').value.replace(/\s\s/g,'').replace(/(>\s)|(>\n)/g,'>') //strips out spaces and newlines
     if (rawString === '') return; //if input is empty, exit the function
 
-    const data = domparser.parseFromString(rawString, 'text/html')
-    const mapEl = data.getElementsByTagName("map")[0].childNodes
+    const data = domparser.parseFromString(rawString, 'text/html') //parses the string into HTML DOM elements
+    const mapEl = data.getElementsByTagName("map")[0].childNodes // collect all children of 'Map' element into an array
 
     mapEl.forEach(node => {
-      if (node.alt !== "") {
+      if (node.alt !== "") { //if the alt property already contains data, it already has a URL
         console.log("Skipped " + node.pathname.substring(1))
         return;
       };
+      node.coords = node.coords.split(', ').map(coord => Math.trunc(coord)).join(', ') //simplify the coordinates to remove decimals - otherwise the image map software won't take back in the values
       const [href, type] = fetchUrl(node.title || node.pathname.substring(1), option, unkeyedData, setExceptions, setMultiples)
-      console.log(node.title || node.pathname.substring(1) + " " + type);
-      node.alt = type === 'search' ? '' : node.title || node.pathname.substring(1)
+      console.log(node.title || node.pathname.substring(1) + " " + type); // log the SKU/Part number to the console
+      node.alt = type === 'search' ? '' : node.title || node.pathname.substring(1) // if the type is Search leave alt property empty
       node.title = node.title === '' ? node.pathname.substring(1) : node.title
       if (type === 'search') {
         node.dataset.maphilight = `{"strokeColor":"ff0000"}`
